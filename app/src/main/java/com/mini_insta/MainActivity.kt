@@ -1,17 +1,11 @@
 package com.mini_insta
 
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.mini_insta.screens.LoginScreen
 import com.mini_insta.screens.MainScreen
 import com.mini_insta.ui.theme.Mini_instaTheme
@@ -26,20 +20,23 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            var loggedEmail by remember { mutableStateOf<String?>(null) }
-
             Mini_instaTheme {
                 Surface {
-                    if (loggedEmail == null) {
-                        LoginScreen { email, password ->
-                            loggedEmail = email
-                        }
+                    if (authViewModel.loggedEmail == null) {
+                        LoginScreen( { email, password ->
+                            authViewModel.login(email, password)
+                        },
+                        errorMessage = authViewModel.errorMessage)
                     } else {
-                        MainScreen(email = loggedEmail!!)
+                        MainScreen(
+                            email = authViewModel.loggedEmail!!,
+                            onLogout = {
+                                authViewModel.logout()
+                            }
+                        )
                     }
                 }
             }
         }
-
     }
 }

@@ -1,6 +1,9 @@
 package view
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import data.insta.api.ApiService
@@ -9,24 +12,35 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
 
+    var loggedEmail by mutableStateOf<String?>(null)
+        private set
+
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
+
     fun login(email: String, password: String) {
         viewModelScope.launch {
             try {
-                Log.d("LOGIN", "Chamando API")
+                errorMessage = null
 
                 val response = ApiService.authApi.login(
                     UserRequest(email, password)
                 )
 
                 if (response.isSuccessful) {
-                    Log.d("LOGIN", "TOKEN: ${response.body()?.token}")
+                    loggedEmail = email
                 } else {
-                    Log.e("LOGIN", "Erro HTTP: ${response.code()}")
+                    errorMessage = "Email ou senha incorretos"
                 }
 
             } catch (e: Exception) {
-                Log.e("LOGIN", "Exception", e)
+                errorMessage = "Erro de conexão"
             }
         }
+    }
+
+    fun logout() {
+        loggedEmail = null
+        errorMessage = null
     }
 }
