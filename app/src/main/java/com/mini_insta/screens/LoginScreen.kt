@@ -1,107 +1,67 @@
 package com.mini_insta.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.scaleIn
-import androidx.compose.foundation.background
+import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
-fun LoginScreen(
-    onLoginClick: (String, String) -> Unit
-) {
+fun LoginScreen(onLogin: (String, String) -> Unit) {
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var visible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        visible = true
-    }
-
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        AnimatedVisibility(
-            visible = visible,
-            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }) + scaleIn()
-        ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                shape = RoundedCornerShape(24.dp),
-                elevation = CardDefaults.cardElevation(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+        Text(
+            text = "Mini Insta",
+            style = MaterialTheme.typography.headlineMedium
+        )
 
-                    Text(
-                        text = "Mini Insta",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+        Spacer(modifier = Modifier.height(32.dp))
 
-                    Spacer(modifier = Modifier.height(8.dp))
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            singleLine = true
+        )
 
-                    Text(
-                        text = "Entre para continuar",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+        Spacer(modifier = Modifier.height(16.dp))
 
-                    Spacer(modifier = Modifier.height(24.dp))
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Senha") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation()
+        )
 
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Email") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp)
-                    )
+        Spacer(modifier = Modifier.height(24.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Senha") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Button(
-                        onClick = { onLoginClick(email, password) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Text("Entrar", fontSize = 16.sp)
-                    }
-                }
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            onClick = {
+                Log.d("LOGIN", "BOTÃO CLICADO")
+                Log.d("LOGIN", "Email: $email | Senha: $password")
+                onLogin(email, password)
             }
+        ) {
+            Text("Entrar")
         }
     }
 }
