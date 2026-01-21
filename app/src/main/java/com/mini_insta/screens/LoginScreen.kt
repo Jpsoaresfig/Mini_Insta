@@ -1,6 +1,5 @@
 package com.mini_insta.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,7 +9,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(onLogin: (String, String) -> Unit) {
+fun LoginScreen(
+    onLogin: (String, String) -> Unit,
+    errorMessage: String? = null
+) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -49,6 +51,14 @@ fun LoginScreen(onLogin: (String, String) -> Unit) {
             visualTransformation = PasswordVisualTransformation()
         )
 
+        if (errorMessage != null) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
@@ -56,8 +66,6 @@ fun LoginScreen(onLogin: (String, String) -> Unit) {
                 .fillMaxWidth()
                 .height(52.dp),
             onClick = {
-                Log.d("LOGIN", "BOTÃO CLICADO")
-                Log.d("LOGIN", "Email: $email | Senha: $password")
                 onLogin(email, password)
             }
         ) {
