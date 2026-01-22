@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,10 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.mini_insta.screens.LoginScreen
 import com.mini_insta.screens.MainScreen
+import com.mini_insta.screens.PostScreen
 import com.mini_insta.screens.RegisterScreen
 import com.mini_insta.ui.theme.Mini_instaTheme
 import view.AuthViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 
 
 class MainActivity : ComponentActivity() {
@@ -28,43 +32,57 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Mini_instaTheme {
-                Surface {
+                Surface(modifier = Modifier.fillMaxSize()) {
 
                     val loggedEmail by authViewModel.loggedEmail.collectAsState()
                     val errorMessage by authViewModel.errorMessage.collectAsState()
-                    var showRegister by remember { mutableStateOf(false) }
 
-                    when {
-                        loggedEmail != null -> {
-                            MainScreen(
-                                email = loggedEmail!! as String,
-                                onLogout = {
-                                    authViewModel.logout()
-                                }
-                            )
-                        }
+                    // Estado da tela: login, register, main, post
+                    var currentScreen by remember { mutableStateOf("login") }
 
-                        showRegister -> {
-                            RegisterScreen(
-                                onRegister = { email, password ->
-                                    authViewModel.register(email, password)
-                                },
-                                onBackToLogin = {
-                                    showRegister = false
-                                },
-                                errorMessage = errorMessage
-                            )
-                        }
+                    // Se estiver logado, vai para main
+                    if (loggedEmail != null && currentScreen == "login") {
+                        currentScreen = "main"
+                    }
 
-                        else -> {
-                            LoginScreen(
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        when (currentScreen) {
+                            "login" -> LoginScreen(
                                 onLogin = { email, password ->
                                     authViewModel.login(email, password)
                                 },
                                 onGoToRegister = {
-                                    showRegister = true
+                                    currentScreen = "register"
                                 },
                                 errorMessage = errorMessage
+                            )
+
+                            "register" -> RegisterScreen(
+                                onRegister = { email, password ->
+                                    authViewModel.register(email, password)
+                                },
+                                onBackToLogin = {
+                                    currentScreen = "login"
+                                },
+                                errorMessage = errorMessage
+                            )
+
+                            "main" -> MainScreen(
+                                email = loggedEmail!!,
+                                onLogout = {
+                                    authViewModel.logout()
+                                    currentScreen = "login"
+                                },
+                                onNavigateToPost = {
+                                    currentScreen = "post"
+                                }
+                            )
+
+                            "post" -> PostScreen(
+                                currentUser = loggedEmail!!,
+                                onPostCreated = {
+                                    currentScreen = "main"
+                                }
                             )
                         }
                     }
