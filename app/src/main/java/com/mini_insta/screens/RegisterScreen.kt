@@ -39,7 +39,7 @@ fun RegisterScreen(
             value = email,
             onValueChange = {
                 email = it
-                localError = null // limpa erro ao digitar
+                localError = null
             },
             label = { Text("Email") },
             singleLine = true
@@ -59,7 +59,7 @@ fun RegisterScreen(
             visualTransformation = PasswordVisualTransformation()
         )
 
-        // Exibe erro vindo do ViewModel ou erro local
+
         val displayError = errorMessage ?: localError
         if (displayError != null) {
             Spacer(modifier = Modifier.height(12.dp))
@@ -76,7 +76,7 @@ fun RegisterScreen(
                 .fillMaxWidth()
                 .height(52.dp),
             onClick = {
-                // Validação simples local
+
                 if (email.isBlank() || password.isBlank()) {
                     localError = "Preencha todos os campos"
                 } else {

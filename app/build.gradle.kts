@@ -6,9 +6,7 @@ plugins {
 
 android {
     namespace = "com.mini_insta"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.mini_insta"
@@ -51,10 +49,16 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.ui)
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.foundation)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
