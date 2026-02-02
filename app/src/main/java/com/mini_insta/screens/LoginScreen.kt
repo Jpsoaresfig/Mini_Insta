@@ -1,5 +1,6 @@
 package com.mini_insta.screens
 
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -74,7 +75,7 @@ fun LoginScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-            Text("OU")
+        Text("OU")
         TextButton(
             onClick = { onGoToRegister() }
         ) {
