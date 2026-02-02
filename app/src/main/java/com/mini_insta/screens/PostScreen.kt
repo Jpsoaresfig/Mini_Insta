@@ -6,18 +6,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import view.PostViewModel
@@ -30,6 +25,9 @@ fun PostScreen(
 ) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var caption by remember { mutableStateOf("") }
+    var isPosting by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -91,21 +89,21 @@ fun PostScreen(
         Spacer(modifier = Modifier.height(28.dp))
 
         Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(54.dp),
-            shape = RoundedCornerShape(14.dp),
-            enabled = selectedImageUri != null,
+            enabled = selectedImageUri != null && !isPosting,
             onClick = {
-                selectedImageUri?.let {
-                    postViewModel.addPost(currentUser, it.toString(), caption)
-                    caption = ""
-                    selectedImageUri = null
+                selectedImageUri?.let { uri ->
+                    isPosting = true
+                    postViewModel.addPost(
+                        context = context,
+                        imageUri = uri,
+                        caption = caption,
+                        userEmail = currentUser
+                    )
                     onPostCreated()
                 }
             }
-        ) {
-            Text("Post")
+        ){
+            Text(if (isPosting) "Posting..." else "Post")
         }
     }
 }

@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +21,10 @@ import com.mini_insta.ui.theme.Mini_instaTheme
 import view.AuthViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import android.util.Log
+
+
+
 
 
 class MainActivity : ComponentActivity() {
@@ -34,19 +39,26 @@ class MainActivity : ComponentActivity() {
             Mini_instaTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
 
-                    val loggedEmail by authViewModel.loggedEmail.collectAsState()
-                    val errorMessage by authViewModel.errorMessage.collectAsState()
+                    val loggedUser by authViewModel.loggedUser.collectAsState(initial = null)
+                    val errorMessage by authViewModel.errorMessage.collectAsState(initial = null)
 
-                    // Estado da tela: login, register, main, post
+
                     var currentScreen by remember { mutableStateOf("login") }
 
-                    // Se estiver logado, vai para main
-                    if (loggedEmail != null && currentScreen == "login") {
-                        currentScreen = "main"
+
+                    LaunchedEffect(loggedUser) {
+                        if (loggedUser != null) {
+                            currentScreen = "main"
+                        }
                     }
 
                     Box(modifier = Modifier.fillMaxSize()) {
+
+                        LaunchedEffect(currentScreen) {
+                            Log.d("NAVIGATION", "Tela atual: $currentScreen")
+                        }
                         when (currentScreen) {
+
                             "login" -> LoginScreen(
                                 onLogin = { email, password ->
                                     authViewModel.login(email, password)
@@ -68,7 +80,8 @@ class MainActivity : ComponentActivity() {
                             )
 
                             "main" -> MainScreen(
-                                email = loggedEmail!!,
+                                userId = loggedUser?.id ?: 0,
+                                email = loggedUser?.email ?: "",
                                 onLogout = {
                                     authViewModel.logout()
                                     currentScreen = "login"
@@ -79,7 +92,7 @@ class MainActivity : ComponentActivity() {
                             )
 
                             "post" -> PostScreen(
-                                currentUser = loggedEmail!!,
+                                currentUser = loggedUser?.email ?: "",
                                 onPostCreated = {
                                     currentScreen = "main"
                                 }
