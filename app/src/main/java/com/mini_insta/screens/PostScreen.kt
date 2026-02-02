@@ -16,11 +16,24 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import view.PostViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.ui.layout.ContentScale
 
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
     currentUser: String,
     onPostCreated: () -> Unit,
+    onBack: () -> Unit,
     postViewModel: PostViewModel = viewModel()
 ) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -28,82 +41,115 @@ fun PostScreen(
     var isPosting by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        selectedImageUri = uri
-    }
+    ) { uri -> selectedImageUri = uri }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Text(
-            text = "New post",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(260.dp),
-            shape = RoundedCornerShape(18.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                if (selectedImageUri == null) {
-                    Button(onClick = { launcher.launch("image/*") }) {
-                        Text("Select photo")
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Novo Post",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
                     }
-                } else {
-                    Image(
-                        painter = rememberAsyncImagePainter(selectedImageUri),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(18.dp))
-                    )
-                }
-            }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                )
+            )
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        OutlinedTextField(
-            value = caption,
-            onValueChange = { caption = it },
-            label = { Text("Write a caption") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
-        )
-
-        Spacer(modifier = Modifier.height(28.dp))
-
-        Button(
-            enabled = selectedImageUri != null && !isPosting,
-            onClick = {
-                selectedImageUri?.let { uri ->
-                    isPosting = true
-                    postViewModel.addPost(
-                        context = context,
-                        imageUri = uri,
-                        caption = caption,
-                        userEmail = currentUser
-                    )
-                    onPostCreated()
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(24.dp)
+                .background(MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+                    .clickable { launcher.launch("image/*") },
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(2.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(alpha = 0.2f))
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (selectedImageUri == null) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                modifier = Modifier.size(48.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text("Toque para selecionar uma foto", style = MaterialTheme.typography.bodyMedium)
+                        }
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(selectedImageUri),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
-        ){
-            Text(if (isPosting) "Posting..." else "Post")
+
+            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedTextField(
+                value = caption,
+                onValueChange = { caption = it },
+                label = { Text("Escreva uma legenda...") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
+                )
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+
+            Button(
+                enabled = selectedImageUri != null && !isPosting,
+                onClick = {
+                    selectedImageUri?.let { uri ->
+                        isPosting = true
+                        postViewModel.addPost(
+                            context = context,
+                            imageUri = uri,
+                            caption = caption,
+                            userEmail = currentUser
+                        )
+                        onPostCreated()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = if (isPosting) "Publicando..." else "Compartilhar",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
         }
     }
 }

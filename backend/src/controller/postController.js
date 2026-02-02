@@ -51,27 +51,49 @@ exports.getFeed = async (req, res) => {
         posts.image_url,
         posts.caption,
         posts.created_at,
-        users.id AS user_id,
-        users.name
-      FROM posts
-      JOIN users ON users.id = posts.user_id
-      ORDER BY posts.created_at DESC
-    `);
-
+        users.name AS user,
+        (SELECT COUNT(*)::int FROM likes WHERE post_id = posts.id) AS "likesCount",
+        EXISTS(SELECT 1 FROM likes WHERE post_id = posts.id AND user_id = $1) AS "likedByMe"
+    FROM posts
+    JOIN users ON users.id = posts.user_id
+    ORDER BY posts.created_at DESC
+`, [req.user.id]);
     const protocol = req.protocol;
-const host = req.get("host");
+    const host = req.get("host");
 
-const feed = result.rows.map(post => {
-  let fileName = post.image_url.replace(/^.*[\\\/]/, '');
-  return { 
-    ...post, 
-    image_url: `${protocol}://${host}/uploads/${fileName}` 
-  };
-});
+    const feed = result.rows.map(post => {
+      let fileName = post.image_url.replace(/^.*[\\\/]/, '');
+      return { 
+        ...post, 
+        image_url: `${protocol}://${host}/uploads/${fileName}` 
+      };
+    });
 
-    res.json(feed);
+    res.json(feed); 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Erro ao carregar o feed" });
+    res.status(500).json({ message: "Erro ao buscar feed" });
   }
+};
+
+exports.toggleLike = async (req, res) => {
+    const { postId } = req.params;
+    const userId = req.user.id;
+
+    try {
+        const check = await pool.query(
+            "SELECT * FROM likes WHERE post_id = $1 AND user_id = $2",
+            [postId, userId]
+        );
+
+        if (check.rows.length > 0) {
+            await pool.query("DELETE FROM likes WHERE post_id = $1 AND user_id = $2", [postId, userId]);
+            return res.json({ liked: false });
+        } else {
+            await pool.query("INSERT INTO likes (post_id, user_id) VALUES ($1, $2)", [postId, userId]);
+            return res.json({ liked: true });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };

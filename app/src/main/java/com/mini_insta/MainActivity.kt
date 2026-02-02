@@ -42,9 +42,7 @@ class MainActivity : ComponentActivity() {
                     val loggedUser by authViewModel.loggedUser.collectAsState(initial = null)
                     val errorMessage by authViewModel.errorMessage.collectAsState(initial = null)
 
-
                     var currentScreen by remember { mutableStateOf("login") }
-
 
                     LaunchedEffect(loggedUser) {
                         if (loggedUser != null) {
@@ -53,12 +51,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     Box(modifier = Modifier.fillMaxSize()) {
-
-                        LaunchedEffect(currentScreen) {
-                            Log.d("NAVIGATION", "Tela atual: $currentScreen")
-                        }
                         when (currentScreen) {
-
                             "login" -> LoginScreen(
                                 onLogin = { email, password ->
                                     authViewModel.login(email, password)
@@ -70,8 +63,8 @@ class MainActivity : ComponentActivity() {
                             )
 
                             "register" -> RegisterScreen(
-                                onRegister = { email, password ->
-                                    authViewModel.register(email, password)
+                                onRegister = { name, email, password ->
+                                    authViewModel.register(name, email, password)
                                 },
                                 onBackToLogin = {
                                     currentScreen = "login"
@@ -80,7 +73,7 @@ class MainActivity : ComponentActivity() {
                             )
 
                             "main" -> MainScreen(
-                                userId = loggedUser?.id ?: 0,
+
                                 email = loggedUser?.email ?: "",
                                 onLogout = {
                                     authViewModel.logout()
@@ -94,6 +87,9 @@ class MainActivity : ComponentActivity() {
                             "post" -> PostScreen(
                                 currentUser = loggedUser?.email ?: "",
                                 onPostCreated = {
+                                    currentScreen = "main"
+                                },
+                                onBack = {
                                     currentScreen = "main"
                                 }
                             )
