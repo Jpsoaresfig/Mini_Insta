@@ -22,10 +22,10 @@ interface PostApi {
         @Header("Authorization") token: String
     ): Response<List<Post>>
 
-    @POST("api/posts/{postId}/like/{userId}")
+    @POST("api/posts/{postId}/like")
     suspend fun toggleLike(
-        @Path("postId") postId: Int,
-        @Path("userId") userId: Int
+        @Header("Authorization") token: String,
+        @Path("postId") postId: Int
     ): Response<Unit>
 
     @Multipart

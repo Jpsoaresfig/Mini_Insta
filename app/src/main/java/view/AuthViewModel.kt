@@ -26,7 +26,7 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val authResponse = ApiService.authApi.login(
-                    UserRequest(email, password)
+                    UserRequest(email = email,password = password)
                 )
 
                 if (!authResponse.isSuccessful) {
@@ -53,11 +53,12 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun register(email: String, password: String) {
+    fun register(name: String, email: String, password: String) {
         viewModelScope.launch {
             try {
+
                 val response = ApiService.authApi.register(
-                    UserRequest(email, password)
+                    UserRequest(name = name, email = email, password = password)
                 )
 
                 if (response.isSuccessful) {
@@ -69,6 +70,7 @@ class AuthViewModel : ViewModel() {
 
             } catch (e: Exception) {
                 _errorMessage.value = "Erro de conexão"
+                Log.e("REGISTER", "Erro: ${e.message}")
             }
         }
     }

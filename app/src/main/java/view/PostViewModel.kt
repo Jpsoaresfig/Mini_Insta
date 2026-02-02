@@ -84,17 +84,17 @@ class PostViewModel : ViewModel() {
         }
     }
 
-    fun toggleLike(postId: Int, userId: Int) {
+    fun toggleLike(postId: Int) {
         viewModelScope.launch {
-
             val token = TokenManager.token ?: return@launch
-
             try {
-                ApiService.postApi.toggleLike(postId, userId)
-                loadFeed(token)
+                val response = ApiService.postApi.toggleLike("Bearer $token", postId)
+
+                if (response.isSuccessful) {
+                    loadFeed(token)
+                }
             } catch (e: Exception) {
-                Log.e("LIKE_ERROR", e.message ?: "Erro ao curtir", e)
+                Log.e("LIKE_ERROR", e.message ?: "Erro")
             }
         }
-    }
-}
+    }}
