@@ -19,67 +19,79 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.Center
     ) {
 
-        Text(
-            text = "Mini Insta",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        TextField(
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            singleLine = true
-        )
+            elevation = CardDefaults.cardElevation(8.dp),
+            shape = MaterialTheme.shapes.large
+        ) {
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation()
-        )
+                Text(
+                    text = "Mini Insta",
+                    style = MaterialTheme.typography.headlineMedium
+                )
 
-        if (errorMessage != null) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = errorMessage,
-                color = MaterialTheme.colorScheme.error
-            )
-        }
+                Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    singleLine = true
+                )
 
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            onClick = {
-                onLogin(email, password)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Senha") },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
+                if (errorMessage != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    onClick = { onLogin(email, password) }
+                ) {
+                    Text("Entrar")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("OU")
+
+                TextButton(onClick = onGoToRegister) {
+                    Text("Criar uma conta")
+                }
             }
-        ) {
-            Text("Entrar")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("OU")
-        TextButton(
-            onClick = { onGoToRegister() }
-        ) {
-            Text("Criar uma conta")
         }
     }
 }

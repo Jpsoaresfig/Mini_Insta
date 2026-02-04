@@ -19,69 +19,94 @@ fun RegisterScreen(
     var password by remember { mutableStateOf("") }
     var localError by remember { mutableStateOf<String?>(null) }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.Center
     ) {
-        Text(text = "Create Account", style = MaterialTheme.typography.headlineMedium)
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-
-        TextField(
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            value = name,
-            onValueChange = { name = it; localError = null },
-            label = { Text("Full Name") },
-            singleLine = true
-        )
+            elevation = CardDefaults.cardElevation(8.dp),
+            shape = MaterialTheme.shapes.large
+        ) {
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = email,
-            onValueChange = { email = it; localError = null },
-            label = { Text("Email") },
-            singleLine = true
-        )
+                Text(
+                    text = "Criar Conta",
+                    style = MaterialTheme.typography.headlineMedium
+                )
 
-        Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = password,
-            onValueChange = { password = it; localError = null },
-            label = { Text("Password") },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation()
-        )
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = name,
+                    onValueChange = { name = it; localError = null },
+                    label = { Text("Nome completo") },
+                    singleLine = true
+                )
 
-        val displayError = errorMessage ?: localError
-        if (displayError != null) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(text = displayError, color = MaterialTheme.colorScheme.error)
-        }
+                Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = email,
+                    onValueChange = { email = it; localError = null },
+                    label = { Text("Email") },
+                    singleLine = true
+                )
 
-        Button(
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            onClick = {
-                if (name.isBlank() || email.isBlank() || password.isBlank()) {
-                    localError = "Preencha todos os campos"
-                } else {
-                    onRegister(name, email, password)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = password,
+                    onValueChange = { password = it; localError = null },
+                    label = { Text("Senha") },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
+                val displayError = errorMessage ?: localError
+                if (displayError != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = displayError,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    onClick = {
+                        if (name.isBlank() || email.isBlank() || password.isBlank()) {
+                            localError = "Preencha todos os campos"
+                        } else {
+                            onRegister(name, email, password)
+                        }
+                    }
+                ) {
+                    Text("Criar conta")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextButton(onClick = onBackToLogin) {
+                    Text("Voltar para login")
                 }
             }
-        ) {
-            Text("Register")
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        TextButton(onClick = onBackToLogin) { Text("Back to login") }
     }
 }
